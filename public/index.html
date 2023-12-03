@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wiki Game</title>
+    <!-- Link to CSS file -->
+</head>
+<body>
+    <h1>Wiki Game</h1>
+    <button id="getUrlsBtn">Get URLs</button>
+    <p>Start URL: <span id="startUrl"></span></p>
+    <p>End URL: <span id="endUrl"></span></p>
+    <button id="startGameBtn">Start Game</button>
+
+    <script>
+        document.getElementById("getUrlsBtn").onclick = function() {
+            // Disable the button after it's clicked
+            this.disabled = true;
+
+            fetch("http://localhost:5000/geturls")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("startUrl").textContent = data.start;
+                document.getElementById("endUrl").textContent = data.end;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Re-enable the button in case of an error
+                this.disabled = false;
+            });
+        };
+
+        document.getElementById("startGameBtn").onclick = function() {
+            // Code to start the game
+            // similar to above except link to executable to start traversal and then disable the button
+        };
+    </script>
+</body>
+</html>
