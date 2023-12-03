@@ -37,30 +37,35 @@ std::vector<int> BFS_Search(int startPage, int endPage, std::unordered_map<int, 
             auto it = visited.find(currId);
             if (it == visited.end()) {
                 Node newNode;
-                newNode.id = adjacencyList[currNode->id][i];
+                newNode.id = currId;
                 newNode.parent = currNode;
                 toVisit.push(newNode);
-                
+                visited.insert(currId);
             }
         }
-        visited.insert(currNode->id);
         currNode = &toVisit.front();
         toVisit.pop();
         iterations++;
-        std::cout << "Iteration: " << iterations << "\tVisiting: " << currNode->id << "\tTo visit size: " << toVisit.size() << "\tVisited size: " << visited.size() << std::endl;
+        if (iterations % 10000 == 0){
+            std::cout << "Iteration: " << iterations << "\tVisiting: " << currNode->id << "\tTo visit size: " << toVisit.size() << "\tVisited size: " << visited.size() << std::endl;
+        }
     }
+    std::cout << "Done iterating!" << std::endl;
 
     std::stack<int> history;
     // go back through the history
     while (currNode != nullptr) {
+        std::cout << "Currnode " << currNode->id << "\tParent " << currNode->parent->id << std::endl;
         history.push(currNode->id);
         currNode = currNode->parent;
     }
     // reverse the order
+    std::cout << "reversing" << std::endl;
     while (history.size() != 0) {
         path.push_back(history.top());
         history.pop();
     }
+    std::cout << "yup" << std::endl;
 
     return path;
     
@@ -181,8 +186,8 @@ int main() {
         endingURL = iter->first;
     } while (startingURL == endingURL);
 
-    std::cout << nameKey[startingURL] << std::endl;
-    std::cout << nameKey[endingURL] << std::endl;
+    std::cout << startingURL << std::endl;
+    std::cout << endingURL << std::endl;
 
     // now call methods to traverse accordingly
 
@@ -190,7 +195,9 @@ int main() {
     std::vector<int> BFSpath;
 
     //TEST from 7 to 6 - 7->5->6
-    BFSpath = BFS_Search(21, 18, adjacencyList);
+    // 2221908 to 22 - 2221908->27->26->22
+    // BFSpath = BFS_Search(startingURL, endingURL, adjacencyList);
+    BFSpath = BFS_Search(2221908, 22, adjacencyList);
 
     std::cout << "BFS path: ";
     for (int i = 0; i < BFSpath.size(); i++) {
