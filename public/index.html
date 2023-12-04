@@ -3,6 +3,7 @@
 <head>
     <title>Wiki Game</title>
     <!-- Link to CSS file -->
+    <link href="styles.css" rel="stylesheet">
 </head>
 <body>
     <h1>Wiki Game</h1>
@@ -16,6 +17,8 @@
     <div id="BFS_s"></div>
     <div id="BFS_t_s"></div>
     <div id="BFS_t_m"></div>
+
+    <div id="BFS_path"></div>
 
     <div id="DFS_s"></div>
     <div id="DFS_t_s"></div>
@@ -41,6 +44,8 @@
                 document.getElementById("BFS_s").textContent = "BFS visited: " + data.bfs_s + " nodes";
                 document.getElementById("BFS_t_s").textContent = "BFS execution time: " + data.bfs_t_s + " seconds";
                 document.getElementById("BFS_t_m").textContent = "BFS execution time: " + data.bfs_t_m + " milliseconds";
+
+                document.getElementById("BFS_path").textContent = "BFS node traversal: " + data.bfs_p;
 
                 document.getElementById("DFS_s").textContent = "DFS visited: " + data.dfs_s + " nodes";
                 document.getElementById("DFS_t_s").textContent = "DFS execution time: " + data.dfs_t_s + " seconds";

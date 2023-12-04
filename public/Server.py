@@ -29,8 +29,9 @@ def start_game():
         DFS_size = output[5]
         DFS_time_s = output[6]
         DFS_time_m = output[7]
+        BFS_path = output[8]
 
-        return jsonify(start=start_url, end=end_url, bfs_s=BFS_size, bfs_t_s=BFS_time_s, bfs_t_m=BFS_time_m, dfs_s=DFS_size, dfs_t_s=DFS_time_s, dfs_t_m=DFS_time_m)
+        return jsonify(start=start_url, end=end_url, bfs_s=BFS_size, bfs_t_s=BFS_time_s, bfs_t_m=BFS_time_m, dfs_s=DFS_size, dfs_t_s=DFS_time_s, dfs_t_m=DFS_time_m, bfs_p=BFS_path)
     else:
         return jsonify({"error": "Invalid output format from C++ program"}), 500
 
