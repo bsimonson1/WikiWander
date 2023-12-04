@@ -10,24 +10,28 @@
 #include <vector>
 #include <stack>
 #include <set>
+#include <chrono>
 
 struct Node {
     int id;
     Node* parent;
 };
 
-std::vector<int> BFS_Search(int startPage, int endPage, std::unordered_map<int, std::vector<int>>& adjacencyList) {
+std::vector<int> BFS_Search(int startPage, int endPage, std::unordered_map<int, std::vector<int>>& adjacencyList) 
+{
     std::unordered_set<int> visited;
-    std::queue<Node> toVisit;
+    std::queue<Node*> toVisit;
     std::vector<int> path;
+    std::stack<Node*> allNodes;
 
-    Node firstNode;
-    firstNode.id = startPage;
-    firstNode.parent = nullptr;
-    toVisit.push(firstNode);
+    Node* tempNode;
+    tempNode = new Node;
+    tempNode->id = startPage;
+    tempNode->parent = nullptr;
+    toVisit.push(tempNode);
+    allNodes.push(tempNode);
 
-    Node* currNode = &firstNode;
-    int iterations = 0;
+    Node* currNode = tempNode;
 
     while (currNode->id != endPage) {
         // go through the adj list of the current node
@@ -36,36 +40,35 @@ std::vector<int> BFS_Search(int startPage, int endPage, std::unordered_map<int, 
             int currId = adjacencyList[currNode->id][i];
             auto it = visited.find(currId);
             if (it == visited.end()) {
-                Node newNode;
-                newNode.id = currId;
-                newNode.parent = currNode;
-                toVisit.push(newNode);
+                tempNode = new Node;
+                tempNode->id = currId;
+                tempNode->parent = currNode;
+                toVisit.push(tempNode);
                 visited.insert(currId);
+                allNodes.push(tempNode);
             }
         }
-        currNode = &toVisit.front();
+        currNode = toVisit.front();
         toVisit.pop();
-        iterations++;
-        if (iterations % 10000 == 0){
-            std::cout << "Iteration: " << iterations << "\tVisiting: " << currNode->id << "\tTo visit size: " << toVisit.size() << "\tVisited size: " << visited.size() << std::endl;
-        }
     }
-    std::cout << "Done iterating!" << std::endl;
 
     std::stack<int> history;
     // go back through the history
     while (currNode != nullptr) {
-        std::cout << "Currnode " << currNode->id << "\tParent " << currNode->parent->id << std::endl;
         history.push(currNode->id);
         currNode = currNode->parent;
     }
     // reverse the order
-    std::cout << "reversing" << std::endl;
     while (history.size() != 0) {
         path.push_back(history.top());
         history.pop();
     }
-    std::cout << "yup" << std::endl;
+
+    // DONT FORGET TO DELETE IF USING NEW
+    for (int i = 0; i < allNodes.size(); i++) {
+        delete allNodes.top();
+        allNodes.pop();
+    }
 
     return path;
     
@@ -82,7 +85,10 @@ std::set<int> DepthFirstTraversal(std::unordered_map<int, std::vector<int>>& adj
         s.pop();
 
         // Check if this node has been visited
-        if (visited.find(u) != visited.end()) continue;
+        if (visited.find(u) != visited.end())
+        {
+            continue;
+        } 
 
         // Visit this node
         visited.insert(u);
@@ -107,10 +113,25 @@ std::set<int> DepthFirstTraversal(std::unordered_map<int, std::vector<int>>& adj
 }
 
 
+int main(int argc, char* argv[]) 
+{
+    if (argc < 3) 
+    {
+        std::cerr << "Usage: program <start_url> <end_url>" << std::endl;
+        return 1;
+    }
 
-int main() {
-    std::ifstream file("C:\\Users\\griff\\OneDrive\\Desktop\\Fall 2023\\DSA\\Final project\\enwiki-2013.csv");
-    std::ifstream key("C:\\Users\\griff\\OneDrive\\Desktop\\Fall 2023\\DSA\\Final project\\enwiki-2013-names.csv");
+    std::string start_url = argv[1];
+    std::string end_url = argv[2];
+
+    int startingURL = std::stoi(start_url);
+    int endingURL = std::stoi(end_url);
+// int main()
+// {
+//     int startingURL = 7;
+//     int endingURL = 200;
+    std::ifstream file("C:\\Users\\bengs\\OneDrive\\Desktop\\WikiWander\\sites.csv");
+    std::ifstream key("C:\\Users\\bengs\\OneDrive\\Desktop\\WikiWander\\enwiki-2013-names.csv");
 
     if (!file.is_open()) 
     {
@@ -169,61 +190,42 @@ int main() {
         nameKey[std::stoi(nameId)] = nameString;
     }
 
-    // Random number generation setup
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(0, adjacencyList.size() - 1);
-
-    // Select two random different starting and ending URLs
-    auto iter = adjacencyList.begin();
-    std::advance(iter, distrib(gen));
-    int startingURL = iter->first;
-
-    int endingURL;
-    do {
-        iter = adjacencyList.begin();
-        std::advance(iter, distrib(gen));
-        endingURL = iter->first;
-    } while (startingURL == endingURL);
-
-    std::cout << startingURL << std::endl;
-    std::cout << endingURL << std::endl;
-
     // now call methods to traverse accordingly
+    // std::cout << BFS_Search(startingURL, endingURL, adjacencyList).size() - 1 << std::endl;
+    // std::cout << DepthFirstTraversal(adjacencyList, startingURL, endingURL).size() - 1 << std::endl;
 
-    // BFS traversal:
-    std::vector<int> BFSpath;
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::seconds;
+    using std::chrono::milliseconds;
 
-    //TEST from 7 to 6 - 7->5->6
-    // 2221908 to 22 - 2221908->27->26->22
-    // BFSpath = BFS_Search(startingURL, endingURL, adjacencyList);
-    BFSpath = BFS_Search(2221908, 22, adjacencyList);
+    // Timer for BFS
+    auto t1 = high_resolution_clock::now();
+    int bfs_result_size = BFS_Search(startingURL, endingURL, adjacencyList).size() - 1;
+    auto t2 = high_resolution_clock::now();
+    auto millis_bfs = duration_cast<milliseconds>(t2 - t1);
+    auto seconds_bfs = duration_cast<seconds>(t2 - t1);
 
-    std::cout << "BFS path: ";
-    for (int i = 0; i < BFSpath.size(); i++) {
-        std::cout << BFSpath[i] << ", ";
-    }
+    // Timer for DFS
+    auto t3 = high_resolution_clock::now();
+    int dfs_result_size = DepthFirstTraversal(adjacencyList, startingURL, endingURL).size() - 1;
+    auto t4 = high_resolution_clock::now();
+    auto millis_dfs = duration_cast<milliseconds>(t4 - t3);
+    auto seconds_dfs = duration_cast<seconds>(t4 - t3);
 
-    //DFS
-    std::cout << DepthFirstTraversal(adjacencyList, 7, 6).size() - 1 << std::endl;
+    std::cout << nameKey[startingURL] << std::endl;
+    std::cout << nameKey[endingURL] << std::endl;
 
+    // Output results
+    std::cout << bfs_result_size << std::endl;
+    std::cout << seconds_bfs.count() << std::endl; 
+    std::cout << millis_bfs.count() << std::endl;
+
+    std::cout << dfs_result_size << std::endl;
+    std::cout << seconds_dfs.count() << std::endl;
+    std::cout << millis_dfs.count() << std::endl;
+    // std::cout << dfs_duration_seconds << std::endl;
 
     return 0;
-
-    // debugging, ensures that each key is populated correctly
-    // (THIS ALSO NEEDS TO BE CHANGED SINCE WE NEED TO CREATE OUR OWN DATA STRUCTURE)
-    // for (const auto& pair : adjacencyList) 
-    // {
-    //     // print the key
-    //     std::cout << "FromNodeID " << pair.first << " links to: ";
-    //     for (const auto& toNodeID : pair.second) 
-    //     {
-    //         // print the keys values
-    //         std::cout << toNodeID << " ";
-    //     }
-    //     // new line after printing all of the keys values
-    //     std::cout << std::endl;
-    // }
 }
-
-
