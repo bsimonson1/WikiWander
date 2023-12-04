@@ -6,32 +6,49 @@
 </head>
 <body>
     <h1>Wiki Game</h1>
-    <button id="getUrlsBtn">Get URLs</button>
-    <p>Start URL: <span id="startUrl"></span></p>
-    <p>End URL: <span id="endUrl"></span></p>
+    <input type="text" id="startInput" placeholder="Enter starting URL">
+    <input type="text" id="endInput" placeholder="Enter ending URL">
     <button id="startGameBtn">Start Game</button>
+    
+    <div id="outputStart"></div>
+    <div id="outputEnd"></div>
+
+    <div id="BFS_s"></div>
+    <div id="BFS_t_s"></div>
+    <div id="BFS_t_m"></div>
+
+    <div id="DFS_s"></div>
+    <div id="DFS_t_s"></div>
+    <div id="DFS_t_m"></div>
 
     <script>
-        document.getElementById("getUrlsBtn").onclick = function() {
-            // Disable the button after it's clicked
-            this.disabled = true;
+        document.getElementById("startGameBtn").onclick = function() {
+            const startUrl = document.getElementById("startInput").value;
+            const endUrl = document.getElementById("endInput").value;
 
-            fetch("http://localhost:5000/geturls")
+            fetch("http://localhost:5000/startGame", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ start: startUrl, end: endUrl }),
+            })
             .then(response => response.json())
             .then(data => {
-                document.getElementById("startUrl").textContent = data.start;
-                document.getElementById("endUrl").textContent = data.end;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Re-enable the button in case of an error
-                this.disabled = false;
-            });
-        };
+                document.getElementById("outputStart").textContent = "Start: " + data.start;
+                document.getElementById("outputEnd").textContent = "End: " + data.end;
 
-        document.getElementById("startGameBtn").onclick = function() {
-            // Code to start the game
-            // similar to above except link to executable to start traversal and then disable the button
+                document.getElementById("BFS_s").textContent = "BFS visited: " + data.bfs_s + " nodes";
+                document.getElementById("BFS_t_s").textContent = "BFS execution time: " + data.bfs_t_s + " seconds";
+                document.getElementById("BFS_t_m").textContent = "BFS execution time: " + data.bfs_t_m + " milliseconds";
+
+                document.getElementById("DFS_s").textContent = "DFS visited: " + data.dfs_s + " nodes";
+                document.getElementById("DFS_t_s").textContent = "DFS execution time: " + data.dfs_t_s + " seconds";
+                document.getElementById("DFS_t_m").textContent = "DFS execution time: " + data.dfs_t_m + " milliseconds";
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
         };
     </script>
 </body>
