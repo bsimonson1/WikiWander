@@ -109,6 +109,18 @@ std::set<int> DepthFirstTraversal(std::unordered_map<int, std::vector<int>>& adj
     return visited; 
 }
 
+bool isDigit(std::string& word)
+{
+    for (char character : word)
+    {
+        if (!isdigit(character))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 
 int main(int argc, char* argv[]) 
 {
@@ -189,6 +201,8 @@ int main(int argc, char* argv[])
 
     //     nameKey[std::stoi(nameId)] = nameString;
     // }
+    int startingURL;
+    int endingURL;
     std::unordered_map<std::string, int> nameKey;
     std::unordered_map<int, std::string> idKey;
     first = true;
@@ -221,8 +235,24 @@ int main(int argc, char* argv[])
         nameKey[nameString] = std::stoi(nameId);
     }
 
-    int startingURL = nameKey[start_url];
-    int endingURL = nameKey[end_url];
+    if (isDigit(start_url))
+    {
+        startingURL = std::stoi(start_url);
+        start_url = idKey[std::stoi(start_url)];
+    }
+    else 
+    {
+        startingURL = nameKey[start_url];
+    }
+    if (isDigit(end_url))
+    {
+        endingURL = std::stoi(end_url);
+        end_url = idKey[std::stoi(end_url)];
+    }
+    else 
+    {
+        endingURL = nameKey[end_url];
+    }
 
     // std::cout << startingURL << std::endl;
     // std::cout << endingURL << std::endl;
