@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Import CORS
+from flask_cors import CORS 
 import subprocess
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app) 
 
 @app.route('/startGame', methods=['POST'])
 def start_game():
@@ -11,7 +11,6 @@ def start_game():
     start_url = data['start']
     end_url = data['end']
 
-    # Call your C++ program with the start and end URLs as arguments
     result = subprocess.run(["C:\\Users\\bengs\\OneDrive\\Desktop\\WikiWander\\main.exe", start_url, end_url],
                             capture_output=True, text=True)
     
@@ -20,7 +19,6 @@ def start_game():
 
     output = result.stdout.splitlines()
     if len(output) >= 6:
-        # Assuming the output format is consistent and the indexes are correct
         start_url = output[0]
         end_url = output[1]
         BFS_size = output[2]
